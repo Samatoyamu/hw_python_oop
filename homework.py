@@ -9,15 +9,15 @@ class InfoMessage:
     distance: float
     speed: float
     calories: float
-    INFO_MESSAGE = ("Тип тренировки: {0}; "
-                    "Длительность: {1:.3f} ч.; "
-                    "Дистанция: {2:.3f} км; "
-                    "Ср. скорость: {3:.3f} км/ч; "
-                    "Потрачено ккал: {4:.3f}."
-                    )
+    MESSAGE = ("Тип тренировки: {training_type}; "
+               "Длительность: {duration:.3f} ч.; "
+               "Дистанция: {distance:.3f} км; "
+               "Ср. скорость: {speed:.3f} км/ч; "
+               "Потрачено ккал: {calories:.3f}."
+               )
 
     def get_message(self) -> str:
-        return self.INFO_MESSAGE.format(*asdict(self).values())
+        return self.MESSAGE.format(**asdict(self))
 
 
 class Training:
@@ -25,6 +25,12 @@ class Training:
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
     MIN_IN_H: int = 60
+    CALORIES_MEAN_SPEED_MULTIPLIER: int = 18
+    CALORIES_MEAN_SPEED_SHIFT: float = 1.79
+    CALORIES_WEIGHT_MULTIPLIER: float = 0.035
+    CALORIES_SPEED_HEIGHT_MULTIPLIER: float = 0.029
+    KMH_IN_MSEC: float = 0.278
+    CM_IN_M: int = 100
 
     def __init__(self,
                  action: int,
@@ -45,6 +51,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
+        pass
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -57,9 +64,6 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    CALORIES_MEAN_SPEED_MULTIPLIER: int = 18
-    CALORIES_MEAN_SPEED_SHIFT: float = 1.79
-
     def get_spent_calories(self) -> float:
         return ((self.CALORIES_MEAN_SPEED_MULTIPLIER
                 * self.get_mean_speed()
@@ -69,11 +73,6 @@ class Running(Training):
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    CALORIES_WEIGHT_MULTIPLIER: float = 0.035
-    CALORIES_SPEED_HEIGHT_MULTIPLIER: float = 0.029
-    KMH_IN_MSEC: float = 0.278
-    CM_IN_M: int = 100
-
     def __init__(self, action, duration, weight, height):
         super().__init__(action, duration, weight)
         self.height = height
@@ -89,13 +88,13 @@ class SportsWalking(Training):
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP: float = 1.38
+    CALORIES_MEAN_SPEED_SHIFT: float = 1.1
+    CALORIES_WEIGHT_MULTIPLIER: int = 2
 
     def __init__(self, action, duration, weight, length_pool, count_pool):
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
-    CALORIES_MEAN_SPEED_SHIFT: float = 1.1
-    CALORIES_WEIGHT_MULTIPLIER: int = 2
 
     def get_spent_calories(self):
         return ((self.get_mean_speed()
@@ -111,7 +110,7 @@ class Swimming(Training):
         return self.action * self.LEN_STEP / self.M_IN_KM
 
 
-WORKOUT_CODE = {
+WORKOUT_CODE: dict = {
     'SWM': Swimming,
     'RUN': Running,
     'WLK': SportsWalking,
@@ -121,9 +120,8 @@ WORKOUT_CODE = {
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     if workout_type not in WORKOUT_CODE.keys():
-        raise RuntimeError('Неподдерживаемый код тренировки')
-    else:
-        return WORKOUT_CODE[workout_type](*data)
+        raise ValueError('Неподдерживаемый код тренировки')
+    return WORKOUT_CODE[workout_type](*data)
 
 
 def main(training: Training) -> None:
