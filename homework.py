@@ -119,7 +119,7 @@ WORKOUT_CODE: dict[str, Training] = {
 }
 
 
-def read_package(workout_type: str, data: list[int]) -> Training:
+def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     if workout_type not in WORKOUT_CODE.keys():
         raise ValueError('Неподдерживаемый код тренировки')
