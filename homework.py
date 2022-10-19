@@ -113,7 +113,7 @@ class Swimming(Training):
         return self.action * self.LEN_STEP / self.M_IN_KM
 
 
-WORKOUT_CODE: Dict[str, type[Training]] = {
+WORKOUT_CODE: Dict[str, Training] = {
     'SWM': Swimming,
     'RUN': Running,
     'WLK': SportsWalking,
