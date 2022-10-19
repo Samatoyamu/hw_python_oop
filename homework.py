@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+from typing import Dict, List
 
 
 @dataclass
@@ -112,14 +113,14 @@ class Swimming(Training):
         return self.action * self.LEN_STEP / self.M_IN_KM
 
 
-WORKOUT_CODE: dict[str] = {
+WORKOUT_CODE: Dict[str, type[Training]] = {
     'SWM': Swimming,
     'RUN': Running,
     'WLK': SportsWalking,
 }
 
 
-def read_package(workout_type: str, data: list) -> Training:
+def read_package(workout_type: str, data: List[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
     if workout_type not in WORKOUT_CODE.keys():
         raise ValueError('Неподдерживаемый код тренировки')
